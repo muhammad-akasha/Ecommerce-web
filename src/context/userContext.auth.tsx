@@ -1,15 +1,9 @@
-import axios from "axios";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useEffect,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 // Define the User interface (customize it as per your needs)
 interface User {
   _id: string;
+  image: string;
   password: string;
   email: string;
   createdAt: string;
@@ -39,62 +33,6 @@ export const LoginUserProvider = ({
   children,
 }: LoginUserProviderProps): JSX.Element => {
   const [user, setUser] = useState<User | null>(null); // Initialize with null (no user logged in)
-
-  const refreshToken = async () => {
-    try {
-      const res = await axios.post(
-        "http://localhost:3000/api/v1/refreshtoken",
-        {},
-        { withCredentials: true }
-      );
-      console.log(res.data.user);
-      setUser(res.data.user);
-    } catch (error) {
-      console.log("Error accured to refresh please login again", error);
-    }
-  };
-
-  const getUser = () => {
-    axios
-      .post(
-        "http://localhost:3000/api/v1/getuser",
-        {},
-        { withCredentials: true }
-      )
-      .then((res) => {
-        console.log(res);
-        setUser(res.data.user as User);
-      })
-      .catch((err) => {
-        if (err.response && err.response.status === 401) {
-          // Access token is expired, refresh it
-          console.log("Access token expired. Trying to refresh...");
-          refreshToken();
-        } else {
-          console.log(err);
-        }
-        setUser(null); // Reset user if error occurs
-      });
-  };
-
-  useEffect(() => {
-    // Check localStorage for existing user on initial load
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      getUser(); // Fetch user if not found in localStorage
-    }
-  }, []); // Run only once on mount
-
-  // Save user to localStorage when it changes
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user"); // Remove user data on logout
-    }
-  }, [user]);
 
   return (
     <loggedInUserContext.Provider value={{ user, setUser }}>

@@ -1,13 +1,9 @@
 "use client";
 
-import * as React from "react";
-
-import { Button } from "../components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -30,7 +26,10 @@ export function DropdownMenuRadioGroupDemo({
         <h2 className="text-white cursor-pointer hover:text-sky-400 flex gap-2 items-center">
           <img
             className="rounded-full w-10 h-10"
-            src="src\images\default-profile.avif"
+            src={
+              user?.image ||
+              `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1YslXPstvXAf87jHcero9lXOzjCFbIo-iZQ&s`
+            }
             alt="profile"
           />
           {user?.userName}

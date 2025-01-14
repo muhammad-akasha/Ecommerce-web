@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 import { useForm, SubmitHandler } from "react-hook-form";
-import axios from "axios";
 import AddOrEditAdForm from "../mycomponents/AddOrEditAdForm";
 import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../mycomponents/Loading";
+import { api } from "../axios-interceptor/axios";
+import { useProducts } from "../context/UserProducts.Context";
 
 type Inputs = {
   name: string;
@@ -25,13 +26,12 @@ const EditAd = () => {
   } = useForm<Inputs>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const { products, setProducts } = useProducts();
 
   const singleProductDetails = async () => {
     setLoading(true);
     try {
-      const res = await axios(
-        `http://localhost:3000/api/v1/singleproduct/${id}`
-      );
+      const res = await api.get(`singleproduct/${id}`);
       console.log(res);
       setSingleProduct(res.data.getSingleProduct);
     } catch (error) {
@@ -67,15 +67,20 @@ const EditAd = () => {
       formData.append("description", data.description);
       formData.append("price", data.price);
       formData.append("image", data.image[0]);
-      const response = await axios.put(
-        `http://localhost:3000/api/v1/product/${id}`,
-        formData,
-        {
-          withCredentials: true,
+      const response = await api.put(`product/${id}`, formData);
+      if (Array.isArray(products)) {
+        const index = products?.findIndex(
+          (item) => item._id === response.data.ad._id
+        );
+        if (index !== -1) {
+          console.log(products, index);
+          const updatedProducts = [...products]; // Create a shallow copy of the products array
+          updatedProducts[index] = response.data.ad; // Update the product at the found index
+          setProducts(updatedProducts);
         }
-      );
-      reset();
-      navigate("/myproduct");
+        reset();
+        navigate("/myproduct");
+      }
     } catch (error) {
       console.log(error);
       // Handle any errors that occur during form submission

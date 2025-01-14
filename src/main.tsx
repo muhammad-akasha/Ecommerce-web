@@ -13,12 +13,14 @@ import { Login } from "./pages/Login.tsx";
 import { SignUp } from "./pages/Signup.tsx";
 import { LoginUserProvider } from "./context/userContext.auth.tsx";
 import SingleProduct from "./pages/SingleProduct.tsx";
-import Order from "./pages/Order.tsx";
+import CartScreen from "./pages/CartScreen.tsx";
 import EditAd from "./pages/EditAd.tsx";
 import { HomeProductsProvider } from "./context/HomePageProduct.context.tsx";
 import { UserProductsProvider } from "./context/UserProducts.Context.tsx";
 import { SingleProductProvider } from "./context/SingleProduct.Context.tsx";
 import { CartProvider } from "./context/Cart.context.tsx";
+import OrderDetailScreen from "./pages/Order.tsx";
+import SingleOrder from "./pages/SingleOrder.tsx";
 
 const route = createBrowserRouter([
   {
@@ -50,8 +52,16 @@ const route = createBrowserRouter([
         element: <EditAd />,
       },
       {
+        path: "cart",
+        element: <CartScreen />,
+      },
+      {
         path: "order",
-        element: <Order />,
+        element: <OrderDetailScreen />,
+      },
+      {
+        path: "order/:id",
+        element: <SingleOrder />,
       },
     ],
   },

@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useAuthenticate } from "../context/userContext.auth";
+import Loading from "./Loading";
+import { api } from "../axios-interceptor/axios";
 
 type Inputs = {
   username: string;
@@ -13,28 +16,48 @@ type Inputs = {
 const ProfileForm = () => {
   const [err, setErr] = useState<string>("");
   const [preview, setPreview] = useState<string | null>(null); // For image preview
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
   } = useForm<Inputs>();
+
+  const { user, setUser } = useAuthenticate();
+
+  // Set form values when product details are fetched
+  useEffect(() => {
+    if (user) {
+      setLoading(true);
+      setValue("username", user.userName || "");
+      setValue("email", user.email || "");
+      setLoading(false);
+    }
+  }, [user, setValue]); // This runs whenever singleProduct changes
 
   // Handle form submission
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      console.log(data);
-
-      // Handle the form submission and file upload logic here
-      // Example:
-      // const formData = new FormData();
-      // formData.append("username", data.username);
-      // formData.append("email", data.email);
-      // formData.append("password", data.password);
-      // formData.append("profilePicture", data.profilePicture[0]);
-
-      // Submit the form data (with image) to your API here
-      // const response = await axios.post('/your-api-endpoint', formData);
+      const formData = new FormData();
+      if (data.username) {
+        formData.append("userName", data.username);
+      }
+      if (data.email) {
+        formData.append("email", data.email);
+      }
+      if (data.password) {
+        formData.append("password", data.password);
+      }
+      if (data.profilePicture[0]) {
+        formData.append("image", data.profilePicture[0]);
+      }
+      const response = await api.post("updateprofile", formData);
+      console.log(response.data);
+      setUser(response.data.updatedUser);
+      reset();
     } catch (error: any) {
       // Handle any errors that occur during form submission
       setErr("An error occurred. Please try again.");
@@ -48,6 +71,10 @@ const ProfileForm = () => {
       setPreview(URL.createObjectURL(file)); // Set image preview
     }
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -110,7 +137,7 @@ const ProfileForm = () => {
           <Input
             type="password"
             id="password"
-            {...register("password", { required: "Password is required" })}
+            {...register("password")}
             placeholder="Enter your password"
             className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
@@ -148,10 +175,11 @@ const ProfileForm = () => {
 
         {/* Submit Button */}
         <Button
+          disabled={isSubmitting}
           type="submit"
           className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
-          Update Profile
+          {isSubmitting ? "Updating..." : " Update Profile"}
         </Button>
       </div>
     </form>

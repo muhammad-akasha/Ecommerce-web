@@ -1,39 +1,85 @@
 import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button";
 import { ModeToggle } from "../components/theme";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuthenticate } from "../context/userContext.auth.js";
-import axios from "axios";
 import { Spinner } from "../components/ui/spinner.js";
 import { DropdownMenuRadioGroupDemo } from "./NavDropdown.tsx";
 import { MdMenuOpen } from "react-icons/md";
 import { BsCart4 } from "react-icons/bs";
 import { useCart } from "../context/Cart.context.tsx";
+import { api } from "../axios-interceptor/axios.ts";
 
 function Navbar() {
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const { cart } = useCart();
 
   const { user, setUser } = useAuthenticate();
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
+  const refreshToken = async () => {
+    setLoading(true);
+    try {
+      const res = await api.post("refreshtoken");
+      console.log(res.data.user);
+      setUser(res.data.user);
+    } catch (error) {
+      console.log("Error accured to refresh please login again", error);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
+
+  const getUser = () => {
+    setLoading(true);
+    api
+      .get("getuser")
+      .then((res) => {
+        console.log(res);
+        setUser(res.data.user);
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 401) {
+          // Access token is expired, refresh it
+          console.log("Access token expired. Trying to refresh...");
+          refreshToken();
+        } else {
+          console.log(err);
+        }
+        setUser(null); // Reset user if error occurs
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    // Check localStorage for existing user on initial load
+    setLoading(true);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      getUser(); // Fetch user if not found in localStorage
+    }
+    setLoading(false);
+  }, []); // Run only once on mount
+
+  // Save user to localStorage when it changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user"); // Remove user data on logout
+    }
+  }, [user]);
 
   const logout = () => {
-    axios
-      .post(
-        "http://localhost:3000/api/v1/logout",
-        {},
-        { withCredentials: true }
-      )
+    api
+      .post("logout")
       .then((res: object) => {
         console.log(res);
         setUser(null);
-        navigate("/login");
       })
       .catch((err: object) => console.log(err));
   };
@@ -49,33 +95,51 @@ function Navbar() {
           </Link>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex space-x-10">
+          <div className="hidden md:flex space-x-4 lg:space-x-10 text-sm md:text-[15px]">
             <Link to="/" className="hover:text-gray-300">
               Home
             </Link>
-            <Link to="/myproduct" className="block text-white">
+            <Link
+              to={!user ? "/login" : `/myproduct`}
+              className="block text-white"
+            >
               My-Product
             </Link>
-            <Link to="/updateprofile" className="hover:text-gray-300">
+            <Link
+              to={!user ? "/login" : "/updateprofile"}
+              className="hover:text-gray-300"
+            >
               Update Profile
             </Link>
-            <Link to="/addproduct" className="hover:text-gray-300">
+            <Link
+              to={!user ? "/login" : "/addproduct"}
+              className="hover:text-gray-300"
+            >
               Add Product
+            </Link>
+            <Link
+              to={!user ? "/login" : "/order"}
+              className="hover:text-gray-300"
+            >
+              Your Orders
             </Link>
           </div>
         </div>
 
         {/* Desktop Button (Login) */}
         <div className="flex gap-4 items-center text-black">
-          {!user ? (
+          {loading ? (
             <Spinner className="text-white" />
           ) : user ? (
             <>
               <DropdownMenuRadioGroupDemo logout={logout} />
-              <Link to={"/order"}>
+              <Link to={"/cart"}>
                 <div className="relative">
                   <div className="flex justify-center items-center rounded-full bg-white text-black absolute top-[-8px] left-3 w-5 h-5 font-sans">
-                    <h5>{cart && cart.length}</h5>
+                    <h5>
+                      {cart &&
+                        cart.reduce((total, item) => total + item.quantity, 0)}
+                    </h5>
                   </div>
                   <BsCart4 fontSize={24} className="text-white" />
                 </div>
@@ -121,7 +185,10 @@ function Navbar() {
           <Link to="/addproduct" className="block text-white">
             Add Product
           </Link>
-          {!user ? (
+          <Link to="/order" className="hover:text-gray-300">
+            Your Orders
+          </Link>
+          {loading ? (
             <Spinner className="text-white" />
           ) : user ? (
             <>

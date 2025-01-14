@@ -1,9 +1,9 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import SingleProductCard from "../mycomponents/SingleProductCard";
 import Loading from "../mycomponents/Loading";
 import { useSingleProduct } from "../context/SingleProduct.Context";
+import { api } from "../axios-interceptor/axios";
 
 const SingleProduct = () => {
   const [loading, setLoading] = useState(true);
@@ -13,9 +13,7 @@ const SingleProduct = () => {
   const singleProductDetails = async () => {
     setLoading(true);
     try {
-      const res = await axios(
-        `http://localhost:3000/api/v1/singleproduct/${id}`
-      );
+      const res = await api.get(`singleproduct/${id}`);
       console.log(res);
       setSingleProduct(res.data.getSingleProduct);
     } catch (error) {

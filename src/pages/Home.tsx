@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../mycomponents/ProductCard";
-import axios from "axios";
 import Loading from "../mycomponents/Loading";
 import { useHomeProducts } from "../context/HomePageProduct.context";
+import { api } from "../axios-interceptor/axios";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
@@ -11,7 +11,7 @@ const Home = () => {
   const getProduct = async () => {
     setLoading(true);
     try {
-      const res = await axios("http://localhost:3000/api/v1/allproduct");
+      const res = await api.get("allproduct");
       console.log(res.data.ads);
       setProducts(res.data.ads);
     } catch (error) {
@@ -34,7 +34,7 @@ const Home = () => {
   return (
     <>
       <h1 className="text-center font-semibold text-4xl my-4">All Products</h1>
-      <div className="flex flex-wrap justify-center gap-5">
+      <div className="flex flex-wrap justify-center gap-5 my-10">
         {products &&
           products.map((item) => {
             return (

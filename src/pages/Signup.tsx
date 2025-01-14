@@ -1,5 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import axios, { AxiosError, responseEncoding } from "axios";
+import { AxiosError } from "axios";
 
 type Inputs = {
   username: string;
@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthenticate } from "../context/userContext.auth";
 import { useEffect, useState } from "react";
 import { Spinner } from "../components/ui/spinner";
+import { api } from "../axios-interceptor/axios";
 
 export function SignUp() {
   const { user, setUser } = useAuthenticate();
@@ -22,20 +23,20 @@ export function SignUp() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setErr("");
     const { username, email, password } = data;
     try {
-      const res = await axios.post("http://localhost:3000/api/v1/register", {
+      const res = await api.post("register", {
         userName: username,
         email,
         password,
       });
       if (res.status === 200) {
-        const res = await axios.post("http://localhost:3000/api/v1/login", {
+        const res = await api.post("login", {
           email,
           password,
         });
@@ -150,9 +151,10 @@ export function SignUp() {
         {/* Submit Button */}
         <Button
           type="submit"
+          disabled={isSubmitting}
           className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
-          Sign Up
+          {isSubmitting ? "Signing..." : "Sign up"}
         </Button>
 
         {/* Login link */}

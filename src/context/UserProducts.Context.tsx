@@ -1,11 +1,4 @@
-import axios from "axios";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useEffect,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 // Define the User interface (customize it as per your needs)
 interface UserProduct {
@@ -41,22 +34,6 @@ export const UserProductsProvider = ({
   children,
 }: UserProductsProvider): JSX.Element => {
   const [products, setProducts] = useState<UserProduct[] | null>([]); // Initialize with null (no user logged in)
-
-  const userProduct = async () => {
-    try {
-      const res = await axios("http://localhost:3000/api/v1/getuserads", {
-        withCredentials: true,
-      });
-      console.log(res);
-      setProducts(res.data.userAds);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    userProduct();
-  }, []);
 
   return (
     <UserProductContext.Provider value={{ products, setProducts }}>

@@ -8,10 +8,11 @@ type Inputs = {
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { useNavigate } from "react-router-dom";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { useAuthenticate } from "../context/userContext.auth";
 import { useEffect, useState } from "react";
 import { Spinner } from "../components/ui/spinner";
+import { api } from "../axios-interceptor/axios";
 
 export function Login() {
   const { user, setUser } = useAuthenticate();
@@ -21,22 +22,19 @@ export function Login() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setErr("");
     const { email, password } = data;
     try {
-      const res = await axios.post(
-        "http://localhost:3000/api/v1/login",
-        {
-          email,
-          password,
-        },
-        { withCredentials: true }
-      );
+      const res = await api.post("login", {
+        email,
+        password,
+      });
       setUser(res.data.user);
+      localStorage.setItem("accesstoken", res.data.accessToken);
       navigate("/");
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -123,9 +121,10 @@ export function Login() {
         {/* Submit Button */}
         <Button
           type="submit"
+          disabled={isSubmitting}
           className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
-          Log In
+          {isSubmitting ? "Logging in..." : "Log In"}
         </Button>
 
         {/* Sign up link */}

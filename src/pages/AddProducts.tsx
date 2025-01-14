@@ -4,6 +4,7 @@ import { Input } from "../components/ui/input";
 import { useForm, SubmitHandler } from "react-hook-form";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { api } from "../axios-interceptor/axios";
 
 type Inputs = {
   title: string;
@@ -19,7 +20,7 @@ const AddProduct = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<Inputs>();
 
   // Handle form submission
@@ -31,13 +32,7 @@ const AddProduct = () => {
       formData.append("description", data.description);
       formData.append("price", data.price);
       formData.append("image", data.image[0]);
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/createproduct",
-        formData,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await api.post("createproduct", formData);
       navigate("/myproduct");
     } catch (error) {
       console.log(error);
@@ -153,10 +148,11 @@ const AddProduct = () => {
 
         {/* Submit Button */}
         <Button
+          disabled={isSubmitting}
           type="submit"
           className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
-          Add Product
+          {isSubmitting ? "Adding product..." : "   Add Product"}
         </Button>
       </div>
     </form>

@@ -7,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import axios from "axios";
 import Swal from "sweetalert2";
+import { api } from "../axios-interceptor/axios";
 
 const ProductCard = ({ name, price, image, showBtn, id }: any) => {
   const navigate = useNavigate();
@@ -32,10 +32,7 @@ const ProductCard = ({ name, price, image, showBtn, id }: any) => {
     if (result.isConfirmed) {
       try {
         // Send delete request to API
-        const res = await axios.delete(
-          `http://localhost:3000/api/v1/deleteproduct/${id}`,
-          { withCredentials: true }
-        );
+        const res = await api.delete(`deleteproduct/${id}`);
         console.log(res);
 
         // Show a success message after successful deletion
@@ -48,9 +45,12 @@ const ProductCard = ({ name, price, image, showBtn, id }: any) => {
     }
   };
   return (
-    <Card className="w-[300px] h-fit cursor-pointer">
+    <Card
+      key={id}
+      className="w-[300px] h-fit cursor-pointer shadow-md shadow-zinc-400"
+    >
       {/* Use Link to navigate to the product details page */}
-      <Link to={`/product/${id}`} key={id}>
+      <Link to={`/product/${id}`}>
         <CardHeader className="pt-4 pb-2 px-6">
           <img
             className="h-[220px] object-cover"

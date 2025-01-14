@@ -1,11 +1,4 @@
-import axios from "axios";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useEffect,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 // Define the SingleProductType interface (customize it as per your needs)
 interface SingleProductType {
@@ -16,6 +9,7 @@ interface SingleProductType {
   createdAt: string;
   createdBy: { userName: string };
   image: string;
+  quantity: number;
 }
 
 // Define the context type for SingleProductContext

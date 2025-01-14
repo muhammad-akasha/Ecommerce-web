@@ -1,20 +1,17 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ProductCard from "../mycomponents/ProductCard";
-import { Link } from "react-router-dom";
 import { useProducts } from "../context/UserProducts.Context";
 import Loading from "../mycomponents/Loading";
+import { api } from "../axios-interceptor/axios";
 
 const MyProducts = () => {
   const { products, setProducts } = useProducts();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const userProduct = async () => {
     setLoading(true);
     try {
-      const res = await axios("http://localhost:3000/api/v1/getuserads", {
-        withCredentials: true,
-      });
+      const res = await api.get("getuserads");
       console.log(res);
       setProducts(res.data.userAds);
     } catch (error) {
@@ -35,7 +32,7 @@ const MyProducts = () => {
   }
 
   return (
-    <div className="flex gap-4 flex-wrap justify-center">
+    <div className="flex gap-4 my-5 flex-wrap justify-center">
       {products && products.length > 0 ? (
         products.map((item) => (
           <div key={item._id}>

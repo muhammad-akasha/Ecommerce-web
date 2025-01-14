@@ -37,9 +37,14 @@ const SingleProductCard = ({
     } else {
       // If not, add the product to the cart
       if (cart) {
+        singleProduct.quantity = 1;
         setCart([...cart, singleProduct]); // Add the new product to the existing cart
+        console.log(cart);
+        localStorage.setItem("cart", JSON.stringify(cart));
       } else {
         setCart([singleProduct]); // Initialize the cart with the first product
+        console.log(cart);
+        localStorage.setItem("cart", JSON.stringify(cart));
       }
 
       // Show SweetAlert for success

@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, {
   createContext,
   useContext,
@@ -6,6 +5,7 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
+import { api } from "../axios-interceptor/axios";
 
 // Define the User interface (customize it as per your needs)
 interface UserProduct {
@@ -44,9 +44,7 @@ export const HomeProductsProvider = ({
 
   const userProduct = async () => {
     try {
-      const res = await axios("http://localhost:3000/api/v1/getuserads", {
-        withCredentials: true,
-      });
+      const res = await api.get("getuserads");
       console.log(res);
       setProducts(res.data.userAds);
     } catch (error) {
