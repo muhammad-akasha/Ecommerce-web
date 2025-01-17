@@ -9,7 +9,6 @@ const AddOrEditAdForm = ({
   errors,
   err,
   heading,
-  isSubmitting,
   btnHeading,
 }: any) => {
   const [preview, setPreview] = useState<string | null>(null); // For image preview

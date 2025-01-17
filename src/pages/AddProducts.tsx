@@ -1,8 +1,5 @@
-import React, { useState } from "react";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
+import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { api } from "../axios-interceptor/axios";
 import { imageToUrl } from "../firebase/firbaseconfig.js";
