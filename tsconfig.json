@@ -9,7 +9,8 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ],
+      "types": ["node", "firebase"]
     }
   }
 }

@@ -9,6 +9,8 @@ const AddOrEditAdForm = ({
   errors,
   err,
   heading,
+  isSubmitting,
+  btnHeading,
 }: any) => {
   const [preview, setPreview] = useState<string | null>(null); // For image preview
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,9 +22,9 @@ const AddOrEditAdForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="w-full max-w-lg mx-auto mt-20 p-8 bg-white shadow-lg rounded-lg">
+      <div className="w-full max-w-lg mx-auto my-20 p-8 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
         {/* Title */}
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
+        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-8">
           {heading}
         </h2>
 
@@ -30,7 +32,7 @@ const AddOrEditAdForm = ({
         <div className="mb-4">
           <label
             htmlFor="username"
-            className="block text-sm font-semibold text-gray-700"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Title
           </label>
@@ -38,30 +40,30 @@ const AddOrEditAdForm = ({
             type="text"
             id="username"
             {...register("name", { required: "title is required" })}
-            placeholder="enter your title"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Enter your title"
+            className="mt-2 p-3 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:ring-indigo-400 dark:text-white"
           />
           {errors.name && (
             <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
           )}
         </div>
 
-        {/* Email Field */}
+        {/* Description Field */}
         <div className="mb-4">
           <label
-            htmlFor="email"
-            className="block text-sm font-semibold text-gray-700"
+            htmlFor="description"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Description
           </label>
           <Input
             type="text"
-            id="text"
+            id="description"
             {...register("description", {
               required: "description is required",
             })}
             placeholder="Enter your description"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="mt-2 p-3 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:ring-indigo-400 dark:text-white"
           />
           {errors.description && (
             <p className="text-sm text-red-500 mt-1">
@@ -70,31 +72,31 @@ const AddOrEditAdForm = ({
           )}
         </div>
 
-        {/* price Field */}
+        {/* Price Field */}
         <div className="mb-6">
           <label
             htmlFor="price"
-            className="block text-sm font-semibold text-gray-700"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Price
           </label>
           <Input
-            type="price"
+            type="text"
             id="price"
             {...register("price", { required: "price is required" })}
             placeholder="Enter your price"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="mt-2 p-3 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:ring-indigo-400 dark:text-white"
           />
           {errors.price && (
             <p className="text-sm text-red-500 mt-1">{errors.price.message}</p>
           )}
         </div>
 
-        {/* Profile Picture Upload */}
+        {/* Product Image Upload */}
         <div className="mb-6">
           <label
             htmlFor="profilePicture"
-            className="block text-sm font-semibold text-gray-700"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Product Image
           </label>
@@ -103,7 +105,7 @@ const AddOrEditAdForm = ({
             id="profilePicture"
             {...register("image")}
             onChange={handleImageChange} // Handle image change for preview
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="mt-2 p-3 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:ring-indigo-400 dark:text-white"
             accept=".jpg,.png,.jpeg"
           />
         </div>
@@ -118,9 +120,9 @@ const AddOrEditAdForm = ({
         {/* Submit Button */}
         <Button
           type="submit"
-          className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-indigo-700 dark:hover:bg-indigo-600"
         >
-          {heading}
+          {btnHeading}
         </Button>
       </div>
     </form>

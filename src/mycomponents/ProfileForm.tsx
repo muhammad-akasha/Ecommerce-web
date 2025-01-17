@@ -5,6 +5,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useAuthenticate } from "../context/userContext.auth";
 import Loading from "./Loading";
 import { api } from "../axios-interceptor/axios";
+import { imageToUrl } from "../firebase/firbaseconfig.js";
+import { useNavigate } from "react-router-dom";
 
 type Inputs = {
   username: string;
@@ -27,7 +29,7 @@ const ProfileForm = () => {
   } = useForm<Inputs>();
 
   const { user, setUser } = useAuthenticate();
-
+  const navigate = useNavigate();
   // Set form values when product details are fetched
   useEffect(() => {
     if (user) {
@@ -40,24 +42,28 @@ const ProfileForm = () => {
 
   // Handle form submission
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    setErr("");
     try {
-      const formData = new FormData();
+      const formData: { [key: string]: string } = {};
       if (data.username) {
-        formData.append("userName", data.username);
+        formData.userName = data.username;
       }
       if (data.email) {
-        formData.append("email", data.email);
+        formData.email = data.email;
       }
       if (data.password) {
-        formData.append("password", data.password);
+        formData.password = data.password;
       }
       if (data.profilePicture[0]) {
-        formData.append("image", data.profilePicture[0]);
+        const url = await imageToUrl(data.profilePicture[0]);
+        formData.image = url;
       }
-      const response = await api.post("updateprofile", formData);
+      const response = await api.post("updateprofile", formData, {});
+
       console.log(response.data);
       setUser(response.data.updatedUser);
       reset();
+      navigate("/");
     } catch (error: any) {
       // Handle any errors that occur during form submission
       setErr("An error occurred. Please try again.");
@@ -78,9 +84,9 @@ const ProfileForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="w-full max-w-lg mx-auto mt-20 p-8 bg-white shadow-lg rounded-lg">
+      <div className="w-full max-w-lg mx-auto my-20 mt-20 p-8 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
         {/* Title */}
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
+        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-8">
           Update Profile
         </h2>
 
@@ -88,7 +94,7 @@ const ProfileForm = () => {
         <div className="mb-4">
           <label
             htmlFor="username"
-            className="block text-sm font-semibold text-gray-700"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Username
           </label>
@@ -97,7 +103,7 @@ const ProfileForm = () => {
             id="username"
             {...register("username", { required: "Username is required" })}
             placeholder="Enter your username"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="mt-2 p-3 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white dark:focus:ring-indigo-400"
           />
           {errors.username && (
             <p className="text-sm text-red-500 mt-1">
@@ -110,7 +116,7 @@ const ProfileForm = () => {
         <div className="mb-4">
           <label
             htmlFor="email"
-            className="block text-sm font-semibold text-gray-700"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Email
           </label>
@@ -119,7 +125,7 @@ const ProfileForm = () => {
             id="email"
             {...register("email", { required: "Email is required" })}
             placeholder="Enter your email"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="mt-2 p-3 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white dark:focus:ring-indigo-400"
           />
           {errors.email && (
             <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
@@ -130,7 +136,7 @@ const ProfileForm = () => {
         <div className="mb-6">
           <label
             htmlFor="password"
-            className="block text-sm font-semibold text-gray-700"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Password
           </label>
@@ -139,7 +145,7 @@ const ProfileForm = () => {
             id="password"
             {...register("password")}
             placeholder="Enter your password"
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="mt-2 p-3 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white dark:focus:ring-indigo-400"
           />
           {errors.password && (
             <p className="text-sm text-red-500 mt-1">
@@ -152,7 +158,7 @@ const ProfileForm = () => {
         <div className="mb-6">
           <label
             htmlFor="profilePicture"
-            className="block text-sm font-semibold text-gray-700"
+            className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
           >
             Profile Picture
           </label>
@@ -161,7 +167,7 @@ const ProfileForm = () => {
             id="profilePicture"
             {...register("profilePicture")}
             onChange={handleImageChange} // Handle image change for preview
-            className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="mt-2 p-3 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white dark:focus:ring-indigo-400"
             accept=".jpg,.png,.jpeg"
           />
         </div>
@@ -177,7 +183,7 @@ const ProfileForm = () => {
         <Button
           disabled={isSubmitting}
           type="submit"
-          className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-indigo-700 dark:hover:bg-indigo-600"
         >
           {isSubmitting ? "Updating..." : " Update Profile"}
         </Button>

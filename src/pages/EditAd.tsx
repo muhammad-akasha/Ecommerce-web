@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../mycomponents/Loading";
 import { api } from "../axios-interceptor/axios";
 import { useProducts } from "../context/UserProducts.Context";
+import { imageToUrl } from "../firebase/firbaseconfig.js";
 
 type Inputs = {
   name: string;
@@ -22,7 +23,7 @@ const EditAd = () => {
     handleSubmit,
     setValue,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<Inputs>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -52,7 +53,6 @@ const EditAd = () => {
       setValue("name", singleProduct.name || "");
       setValue("description", singleProduct.description || "");
       setValue("price", singleProduct.price || "");
-      setValue("image", singleProduct.image || "");
       setLoading(false);
     }
   }, [singleProduct, setValue]); // This runs whenever singleProduct changes
@@ -62,11 +62,16 @@ const EditAd = () => {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       setErr("");
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("description", data.description);
-      formData.append("price", data.price);
-      formData.append("image", data.image[0]);
+      const formData: { [key: string]: string } = {};
+      formData.name = data.name;
+      formData.description = data.description;
+      formData.price = data.price;
+      if (data.image[0]) {
+        const url = await imageToUrl(data.image[0]);
+        formData.image = url;
+      }
+      console.log(formData);
+
       const response = await api.put(`product/${id}`, formData);
       if (Array.isArray(products)) {
         const index = products?.findIndex(
@@ -99,6 +104,8 @@ const EditAd = () => {
         handleSubmit={handleSubmit}
         err={err}
         heading={"Edit Product"}
+        btnHeading={isSubmitting ? "Editing..." : "Edit"}
+        isSubmitting={isSubmitting}
       />
     </div>
   );
